@@ -1,0 +1,20 @@
+.denied-form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    margin-top: 5vh;
+    max-width: 533px;
+}
+.no-internet{
+    width: 50vw;
+}
+
+.oh-no-sorry-you-do{
+    text-align: center;
+}
+@media screen and (max-width: 600px) {
+    .denied-form{
+        margin: 15vh 2vh 5vh 2vh;
+    }
+}
