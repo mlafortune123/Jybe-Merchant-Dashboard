@@ -8,6 +8,7 @@ import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the 
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 import { Aside } from "./Aside.jsx"
 import { Header } from './Header.jsx';
+import user from "./images/user.svg"
 
 const User = () => {
     const user_id = window.location.pathname.substring(6, 42)
@@ -51,14 +52,14 @@ const User = () => {
     }
     const IndexHeader = () => (
         <div style={{ textAlign: 'center' }}>#</div>
-      );
+    );
     const colDefs = [
         {
             headerComponentFramework: IndexHeader,
             valueGetter: 'node.rowIndex + 1',
             width: 50,
             pinned: 'left',
-          },
+        },
         { field: "Date" },
         { field: "Product name" },
         { field: "Loan Amount", cellRenderer: props => `$${props.value}` },
@@ -70,147 +71,124 @@ const User = () => {
     ]
 
     return (
-        <div className='ytop' >
-                <Aside/>
-                {rowData &&
-                    <div className='inside-wrapper' >
-                        <div style={{ background: 'white', padding: '24px', border: '1px solid lightgrey', borderRadius: '16px' }} >
-                            <h2>USER PROFILE</h2>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', marginTop: '16px' }} >
-                                <div>
-                                    <u>Contact Info</u>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Name:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {userOrders[0].first_name} {userOrders[0].last_name}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Email:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {userOrders[0].email}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Phone:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {userOrders[0].phone}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Date of Birth:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {userOrders[0].dob.substring(0, 10)}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Passed Credit Check:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' style={{ color: userOrders[0].passed ? 'green' : 'red' }}  >
-                                            {userOrders[0].passed.toString()}
-                                        </p>
-                                    </div>
+        <div className='flex-fullscreen subs' >
+            <Aside />
+            {rowData &&
+                <div className='inside-wrapper' >
+                    <div className='order' >
+                            <h2 style={{fontSize:'36px'}}><img className='ma-img' src={user} style={{marginRight:'8px'}} />{userOrders[0].first_name} {userOrders[0].last_name}'s Profile</h2>
+                            <p>ID: {user_id}</p>
+                        <div style={{ background: 'grey', height: '2px', width: '100%', margin: '10px 0px' }} />
+                        <h2>Subscriptions & Contact Info</h2>
+                        <div className='summary-wrapper'>
+                            <div style={{width:'40%'}} >
+                                <div className='userdata-pair' >
+                                    <p className='userdata-key'>
+                                        Number of Subs:&nbsp;
+                                    </p>
+                                    <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
+                                        {rowData.length}
+                                    </p>
+                                </div>
+                                <div className='userdata-pair' >
+                                    <p className='userdata-key'>
+                                        Active Subs:&nbsp;
+                                    </p>
+                                    <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
+                                        {(rowData.filter(order => order.Status == 'active')).length}
+                                    </p>
+                                </div>
+                                <div className='userdata-pair' >
+                                    <p className='userdata-key'>
+                                        Monthly Bill:&nbsp;
+                                    </p>
+                                    <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
+                                        ${Math.round(userOrders.reduce((a, b) => {
+                                            return a + parseFloat(b.jybe_cost)
+                                        }, 0))}
+                                    </p>
+                                </div>
+                                <div className='userdata-pair' >
+                                    <p className='userdata-key'>
+                                        Total Value of Subs:&nbsp;
+                                    </p>
+                                    <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
+                                        ${userOrders.reduce((a, b) => {
+                                            return a + parseFloat(b.amount)
+                                        }, 0)}
+                                    </p>
+                                </div>
+                                <div className='userdata-pair' >
+                                    <p className='userdata-key'>
+                                        After markups earnings:&nbsp;
+                                    </p>
+                                    <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
+                                        ${userOrders.reduce((a, b) => {
+                                            return a + (b.amount * (1 - (b.merchant_markup / 100)))
+                                        }, 0)}
+                                    </p>
+                                </div>
+                            </div>
+                            <div>
+                                <div className='userdata-pair' >
+                                    <p className='userdata-key'>
+                                        Email:&nbsp;
+                                    </p>
+                                    <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
+                                        {userOrders[0].email}
+                                    </p>
+                                </div>
+                                <div className='userdata-pair' >
+                                    <p className='userdata-key'>
+                                        Phone:&nbsp;
+                                    </p>
+                                    <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
+                                        {userOrders[0].phone}
+                                    </p>
+                                </div>
+                                <div className='userdata-pair' >
+                                    <p className='userdata-key'>
+                                        Date of Birth:&nbsp;
+                                    </p>
+                                    <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
+                                        {userOrders[0].dob.substring(0, 10)}
+                                    </p>
+                                </div>
+                                <div className='userdata-pair' >
+                                    <p className='userdata-key'>
+                                        Passed Credit Check:&nbsp;
+                                    </p>
+                                    <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ style={{ color: userOrders[0].passed ? 'green' : 'red' }}  >
+                                        {userOrders[0].passed.toString()}
+                                    </p>
                                 </div>
                                 <div>
-                                    <u>Billing Info</u>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Country:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {userOrders[0].country}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Province:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {userOrders[0].province}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            City:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {userOrders[0].city}
-                                        </p>
-                                    </div>
                                     <div className='userdata-pair' >
                                         <p className='userdata-key'>
                                             Address:&nbsp;
                                         </p>
-                                        <p className='userdata-value' >
-                                            {userOrders[0].address}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Zip Code:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {userOrders[0].zip}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div>
-                                    <u>
-                                        Subscriptions Info
-                                    </u>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Number of Subs:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {rowData.length}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Active Subs:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {(rowData.filter(order => order.Status == 'active')).length}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Monthly Bill:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            ${Math.round(userOrders.reduce((a, b) => {
-                                                return a + parseFloat(b.jybe_cost)
-                                            }, 0))/100}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Total Value of Subs:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            ${userOrders.reduce((a, b) => {
-                                                return a + (b.amount)
-                                            }, 0)}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            After markups earnings:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            ${userOrders.reduce((a, b) => {
-                                                return a + (b.amount * (1- (b.merchant_markup/100)))
-                                            }, 0)}
+                                        <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
+                                            {userOrders[0].address}, {userOrders[0].city}, {userOrders[0].province}, {userOrders[0].country}, {userOrders[0].zip}
                                         </p>
                                     </div>
                                 </div>
@@ -227,8 +205,9 @@ const User = () => {
                             />
                         </div>
                     </div>
-                }
-            </div>
+                </div>
+            }
+        </div>
     )
 }
 

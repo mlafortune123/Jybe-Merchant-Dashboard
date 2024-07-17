@@ -2,10 +2,12 @@ import React, { createContext, useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import Loading from './Loading';
 import { useNavigate } from "react-router-dom";
-const API_URL = process.env.REACT_APP_API_URL
 export const AccountContext = createContext();
 
-export const ProtectedRoute = ({ component: Component, ...props }) => {
+export const ProtectedRoute = ({ component: Component }) => {
+    const testing = window.location.origin.includes("testing") || window.location.origin.includes("localhost")
+    //const testing = false
+    const API_URL = testing ? process.env.REACT_APP_TESTING_API_URL : process.env.REACT_APP_PRODUCTION_API_URL
     const [orders, setOrders] = useState();
     const [merchant, setMerchant] = useState()
     const [payments, setPayments] = useState()
@@ -14,9 +16,10 @@ export const ProtectedRoute = ({ component: Component, ...props }) => {
     const [frozen, setFrozen] = useState()
     // const [activeOrders, setActiveOrders] = useState()
     // const [inactiveOrders, setInactiveOrders] = useState()
-    const { isAuthenticated, isLoading, loginWithRedirect, getAccessTokenSilently, user } = useAuth0();
+    const { isAuthenticated, isLoading, loginWithRedirect, getAccessTokenSilently, getIdTokenClaims, user } = useAuth0();
     const [accessToken, setAccessToken] = useState()
     const [refreshToken, setRefreshToken] = useState()
+    const [isDone, setIsDone] = useState(false)
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -28,15 +31,17 @@ export const ProtectedRoute = ({ component: Component, ...props }) => {
     useEffect(() => {
         async function backOnMyBullshit() {
             const token = await getAccessTokenSilently();
+            const { __raw: idToken } = await getIdTokenClaims();
             setAccessToken(token)
             accessToken && fetch(`${API_URL}/adminget`, {
                 method: "GET",
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`
+                    'Authorization': `Bearer ${accessToken}`,
+                    'X-ID-Token': idToken
                 }
             })
                 .then(response => {
-                    if (response.status == 401) window.location.reload()
+                    //if (response.status == 401) window.location.reload()
                     if (response.status == 403) navigate("/")
                     if (response.status === 500 || response.status === 502) window.alert("The requested service is currently unavailable at the moment.")
                     return response.json()
@@ -51,6 +56,7 @@ export const ProtectedRoute = ({ component: Component, ...props }) => {
                         setMerchant(res.merchant)
                         setPayments(res.payments)
                         setAdmins(res.admins)
+                        setIsDone(true)
                     }
                 })
 
@@ -77,7 +83,7 @@ export const ProtectedRoute = ({ component: Component, ...props }) => {
                 })
         }
         backOnMyBullshit()
-    }, [accessToken])
+    }, [accessToken, refreshToken])
 
     const calculateMonthsDifference = async (item) => {
         const itemDate = new Date(item.created_at);
@@ -97,12 +103,12 @@ export const ProtectedRoute = ({ component: Component, ...props }) => {
     if (window.location.search.includes('?error=access_denied&error_description=Please%20verify%20your%20email%20before%20continuing.')) {
         navigate("/IntermediateScreen?noerror")
     }
-    else if (isLoading) {
+    else if (isLoading || !isDone) {
         return <Loading />; // Render a loading indicator while authentication state is being determined
     }
     else if (isAuthenticated) {
         return (
-            <AccountContext.Provider value={{ orders, merchant, user, accessToken, navigate, payments, admins }}>
+            <AccountContext.Provider value={{ orders, merchant, user, accessToken, navigate, payments, admins, frozen, refreshTheClock, API_URL }}>
                 <Component />
             </AccountContext.Provider>
         ); // User is authenticated, render the component

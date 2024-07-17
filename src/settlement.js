@@ -8,6 +8,7 @@ import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the 
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 import { Aside } from "./Aside.jsx"
 import { Header } from './Header.jsx';
+import settlement from './images/settlement.svg'
 
 const Settlement = () => {
     const payment_id = window.location.pathname.substring(12, 48)
@@ -27,7 +28,7 @@ const Settlement = () => {
     useEffect(() => {
         if (orders && merchant && payments) {
             const payment = payments.filter(payment => payment.payment_id == payment_id)[0]
-            const settledOrders = orders.filter(order => order.created_at.substring(0,10) == payment.payment_date.substring(0,10))
+            const settledOrders = orders.filter(order => order.created_at.substring(0,10) == payment.payment_date.substring(0,10) && order.order_status != 'inactive')
 
             setPayment(payment)
             setSettledOrders(settledOrders)
@@ -65,7 +66,7 @@ const Settlement = () => {
           },
         { field: "Date" },
         { field: "Product name" },
-        { field: "Loan Amount", cellRenderer: props => `$${props.value}` },
+        { field: "Loan Amount", cellRenderer: props => `${props.value}` },
         {
             field: "Order ID",
             cellRenderer: OrderLinkRenderer
@@ -77,79 +78,34 @@ const Settlement = () => {
     ]
 
     return (
-        <div className='ptob'>
+        <div className='flex-fullscreen settlements'>
                 <Aside/>
                 {rowData && merchant &&
                     <div className='inside-wrapper' >
-                        <div style={{ background: 'white', padding: '24px', border: '1px solid lightgrey', borderRadius: '16px' }} >
-                            <h2>SETTLEMENT PROFILE</h2>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', marginTop: '16px' }} >
-                                <div>
-                                    <u>Merchant's Info</u>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Name:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {merchant.merchant_name}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            ID:&nbsp;
-                                        </p>
-                                        <Link to={`/merchant/${merchant.merchant_id}`} className='userdata-value' >
-                                            {merchant.merchant_id}
-                                        </Link>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Status:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {merchant.merchant_status}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Today's Tab:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            ${parseFloat(merchant.daily_tab)}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Total Tab:&nbsp;
-                                        </p>
-                                        <p className='userdata-value'>
-                                            ${parseFloat(merchant.total_tab)}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div>
-                                    <u>Subscriptions Info</u>
+                        <div className='order' > 
+                            <h2 style={{fontSize:'36px'}} ><img className='ma-img' src={settlement} style={{marginRight:'8px'}} />Settlement for ${payment.payment_amount} on {payment.payment_date.substring(0,10)} </h2>
+                            <p>ID: {payment_id}</p>
+                            <div style={{ background: 'grey', height: '2px', width: '100%', margin: '10px 0px' }} />
+                            <h2>Subscriptions Info</h2>
+                            <div className='space-between' style={{flexWrap: 'wrap', marginTop: '16px' }} >
+                                <div style={{width:'40%'}} >
                                     <div className='userdata-pair' >
                                         <p className='userdata-key'>
                                             Number of Subs:&nbsp;
                                         </p>
-                                        <p className='userdata-value' >
+                                        <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
                                             {rowData.length}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Active Subs:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {(rowData.filter(order => order.Status == 'active')).length}
                                         </p>
                                     </div>
                                     <div className='userdata-pair' >
                                         <p className='userdata-key'>
                                             Monthly Subs intake:&nbsp;
                                         </p>
-                                        <p className='userdata-value' >
+                                        <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
                                             ${Math.round(settledOrders.reduce((a, b) => {
                                                 return a + parseFloat(b.jybe_cost)
                                             }, 0))/100}
@@ -159,56 +115,23 @@ const Settlement = () => {
                                         <p className='userdata-key'>
                                             Total Value of Subs:&nbsp;
                                         </p>
-                                        <p className='userdata-value' >
+                                        <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
                                             ${settledOrders.reduce((a, b) => {
                                                 return a + (b.amount)
                                             }, 0)}
                                         </p>
                                     </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            After markups earnings:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            ${settledOrders.reduce((a, b) => {
-                                                return a + (b.amount * (1- (b.merchant_markup/100)))
-                                            }, 0)}
-                                        </p>
-                                    </div>
                                 </div>
-                                <div>
-                                    <u>
-                                        Math Breakdown
-                                    </u>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                           Site URL:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {merchant.site_url}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Webhook URL:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {merchant.webhook_url}
-                                        </p>
-                                    </div>
-                                    <div className='userdata-pair' >
-                                        <p className='userdata-key'>
-                                            Photo URL:&nbsp;
-                                        </p>
-                                        <p className='userdata-value' >
-                                            {merchant.photo_url}
-                                        </p>
-                                    </div>
+                                <div style={{width:'40%'}}>
                                     <div className='userdata-pair' >
                                         <p className='userdata-key'>
                                             Total User Markups:&nbsp;
                                         </p>
-                                        <p className='userdata-value' >
+                                        <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
                                             ${settledOrders.reduce((a, b) => {
                                                 return a + (b.order_user_markup/100) * b.amount
                                             }, 0)}
@@ -218,16 +141,28 @@ const Settlement = () => {
                                         <p className='userdata-key'>
                                             Total Merchant Markups:&nbsp;
                                         </p>
-                                        <p className='userdata-value' >
+                                        <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
                                             ${settledOrders.reduce((a, b) => {
                                                 return a + (b.order_merchant_markup/100) * b.amount
                                             }, 0)}
                                         </p>
                                     </div>
+                                    <div className='userdata-pair' >
+                                        <p className='userdata-key'>
+                                            After markups earnings:&nbsp;
+                                        </p>
+                                        <span className='userdata-divider'></span>
+                                        <p className='userdata-value'
+ >
+                                            ${settledOrders.reduce((a, b) => {
+                                                return a + (b.amount * (1- (b.merchant_markup/100)))
+                                            }, 0)}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <u>Subscriptions Settled</u>
                         <div
                             className="ag-theme-quartz" // applying the grid theme
                             style={{ height: '50vh', width: '100%', paddingTop: '1vh' }} // the grid will fill the size of the parent container
@@ -237,6 +172,7 @@ const Settlement = () => {
                                 columnDefs={colDefs}
                                 rowDragManaged={true}
                             />
+                        </div>
                         </div>
                     </div>
                 }

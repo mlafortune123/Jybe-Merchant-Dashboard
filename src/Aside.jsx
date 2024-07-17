@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import home from "./images/Home.svg";
 import wallet from "./images/Wallet.svg";
 import calender from "./images/Calendar.svg";
@@ -10,87 +10,142 @@ import logoutimg from "./images/logout.svg"
 import logo from "./images/logo.svg"
 import settlement from "./images/settlement.svg"
 import { useAuth0 } from '@auth0/auth0-react';
-//import saved from "../images/yearly-saved.svg";
+import { slide as Menu } from 'react-burger-menu'
 export const Aside = () => {
   const { logout } = useAuth0();
+  const [isOpen, setIsOpen] = useState(false)
   return (
-    <div class="pages-wrapper">
-      <div className="logo">
-        <img src={logo} alt="logo" />
-        <p style={{textAlign:'center', marginTop: '10px' }} >Merchant Dashboard</p>
-      </div>
-      <div>
-        <div className={`page-link ${window.location.pathname === '/' ? 'active' : ''}`}>
-          {window.location.pathname === '/' && <div class="border" />}
-          <Link to="/">
-            <img className="ma-img" src={home} alt="svg" /> Dashboard
-          </Link>
+    <div style={{paddingTop:'2vh', background:'rgba(255, 255, 255, 0.5)', width:'200px' }} >
+        <div className="logo" style={{height:'52.5px', alignContent:'center' }} >
+          <img src={logo} alt="logo" />
+          {/* <p style={{textAlign:'center', marginTop: '10px' }} >Merchant Dashboard</p> */}
         </div>
+        <div className="pages-wrapper">
+        <div>
+          <div className={`page-link ${window.location.pathname === '/' ? 'active' : ''}`}>
+            {window.location.pathname === '/' && <div class="border" />}
+            <Link to="/">
+              <img className="ma-img" src={home} alt="svg" /> Dashboard
+            </Link>
+          </div>
 
-        <div class={`page-link ${window.location.pathname === '/subscriptions' ? 'active' : ''}`}>
-          {window.location.pathname === '/subscriptions' && <div class="border" />}
-          <Link to="/subscriptions">
-            <img className="ma-img" src={calender} alt="svg" />
-            Subscriptions
-          </Link>
+          <div class={`page-link ${window.location.pathname === '/subscriptions' ? 'active' : ''}`}>
+            {window.location.pathname === '/subscriptions' && <div class="border" />}
+            <Link to="/subscriptions">
+              <img className="ma-img" src={calender} alt="svg" />
+              Subscriptions
+            </Link>
+          </div>
+
+          <div class={`page-link ${window.location.pathname === '/settlements' ? 'active' : ''}`}>
+            {window.location.pathname === '/settlements' && <div class="border" />}
+            <Link to="/settlements">
+              <img className="ma-img" src={settlement} alt="svg" />
+              Settlements
+            </Link>
+          </div>
+
         </div>
-
-        <div class={`page-link ${window.location.pathname === '/settlements' ? 'active' : ''}`}>
-          {window.location.pathname === '/settlements' && <div class="border" />}
-          <Link to="/settlements">
-            <img className="ma-img" src={settlement} alt="svg" />
-            Settlements
-          </Link>
+        <div >
+          <div class="page-link">
+            <a onClick={() => window.open("mailto:michaeltiller@jybe.ca")}>
+              <img className="ma-img" src={chat} alt="svg" />
+              Email Support
+            </a>
+          </div>
+          <div class={`page-link ${window.location.pathname === '/settings' ? 'active' : ''}`}>
+            {window.location.pathname === '/settings' && <div class="border" />}
+            <Link to="/settings">
+              <img className="ma-img" src={settings} alt="svg" />
+              Settings
+            </Link>
+          </div>
         </div>
-
-      </div>
-      <div >
-        <div class="page-link">
-          <a onClick={() => window.open("mailto:michaeltiller@jybe.ca")}>
-            <img className="ma-img" src={chat} alt="svg" />
-            Get Help
+        <div className="page-link" >
+          <a
+            className="design-component-instance-node"
+            icon="false"
+            size="lg"
+            state="default"
+            text="Log Out"
+            type="primary"
+            onClick={() => logout({
+              logoutParams: {
+                returnTo: window.location.origin
+              }
+            })}
+          >
+            <img className="ma-img" src={logoutimg} />
+            Log Out
           </a>
         </div>
-        <div class={`page-link ${window.location.pathname === '/settings' ? 'active' : ''}`}>
-          {window.location.pathname === '/settings' && <div class="border" />}
-          <Link to="/settings">
-            <img className="ma-img" src={settings} alt="svg" />
-            Settings
-          </Link>
-        </div>
       </div>
-      <div className="page-link" >
-        <a
-          className="design-component-instance-node"
-          icon="false"
-          size="lg"
-          state="default"
-          text="Log Out"
-          type="primary"
-          onClick={() => logout({
-            logoutParams: {
-              returnTo: window.location.origin
-            }
-          })}
-        >
-          <img className="ma-img" src={logoutimg} />
-          Log Out
-        </a>
+      <div className="hamburger-please" >
+      <Menu isOpen={isOpen} >
+        <div className="logo">
+          <img src={logo} alt="logo" />
+          {/* <p style={{textAlign:'center', marginTop: '10px' }} >Merchant Dashboard</p> */}
+        </div>
+        <div style={{ marginTop: '-5vh' }} >
+          <div className={`page-link ${window.location.pathname === '/' ? 'active' : ''}`}>
+            {window.location.pathname === '/' && <div class="border" />}
+            <Link to="/">
+              <img className="ma-img" src={home} alt="svg" /> Dashboard
+            </Link>
+          </div>
+
+          <div class={`page-link ${window.location.pathname === '/subscriptions' ? 'active' : ''}`}>
+            {window.location.pathname === '/subscriptions' && <div class="border" />}
+            <Link to="/subscriptions">
+              <img className="ma-img" src={calender} alt="svg" />
+              Subscriptions
+            </Link>
+          </div>
+
+          <div class={`page-link ${window.location.pathname === '/settlements' ? 'active' : ''}`}>
+            {window.location.pathname === '/settlements' && <div class="border" />}
+            <Link to="/settlements">
+              <img className="ma-img" src={settlement} alt="svg" />
+              Settlements
+            </Link>
+          </div>
+
+        </div>
+        <div >
+          <div class="page-link">
+            <a onClick={() => window.open("mailto:michaeltiller@jybe.ca")}>
+              <img className="ma-img" src={chat} alt="svg" />
+              Email Support
+            </a>
+          </div>
+          <div class={`page-link ${window.location.pathname === '/settings' ? 'active' : ''}`}>
+            {window.location.pathname === '/settings' && <div class="border" />}
+            <Link to="/settings">
+              <img className="ma-img" src={settings} alt="svg" />
+              Settings
+            </Link>
+          </div>
+        </div>
+        <div className="page-link" >
+          <a
+            className="design-component-instance-node"
+            icon="false"
+            size="lg"
+            state="default"
+            text="Log Out"
+            type="primary"
+            onClick={() => logout({
+              logoutParams: {
+                returnTo: window.location.origin
+              }
+            })}
+          >
+            <img className="ma-img" src={logoutimg} />
+            Log Out
+          </a>
+        </div>
+      </Menu>
       </div>
-      {/* <div class="yousaved">
-        <div>
-          <img className="ma-img" src={saving} alt="svg" />
-          <p>
-            You've saved <span>${totalSavings.toFixed(2)}</span> to date
-          </p>
-        </div>
-        <div>
-          <img className="ma-img" src={saved} alt="svg" />
-          <p>
-            You've saved <span>$567</span> Yearly
-          </p>
-        </div>
-      </div> */}
     </div>
   );
 };

@@ -1,0 +1,19 @@
+@media screen and (max-width: 600px) {
+.pages-wrapper{
+    display: none!important;
+}
+.space-between{
+    flex-direction: column;
+}
+.page-title{
+    height: auto!important;
+}
+.hamburger-please{
+    display: flex!important
+}
+.page-title{
+    margin-left: 80px;
+    font-size: 32px!important;
+    margin-bottom: 16px;
+}
+}

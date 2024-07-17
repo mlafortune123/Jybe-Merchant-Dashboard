@@ -5,11 +5,13 @@ import App from './App';
 import ReactGA from 'react-ga4';
 import { Auth0Provider } from '@auth0/auth0-react';
 
-if (process.env.REACT_APP_API_URL == "https://api.jybe.ca") ReactGA.initialize('G-8LD765N85S');
 const app = document.getElementById("root");
 const root = ReactDOMClient.createRoot(app);
-const domain = process.env.REACT_APP_DOMAIN;
-const clientId = process.env.REACT_APP_CLIENT_ID;
+const testing = window.location.origin.includes("testing") || window.location.origin.includes("localhost")
+//const testing = false
+if (!testing) ReactGA.initialize('G-8LD765N85S');
+const domain = testing ? process.env.REACT_APP_TESTING_DOMAIN : process.env.REACT_APP_PRODUCTION_DOMAIN
+const clientId = testing ? process.env.REACT_APP_TESTING_CLIENT_ID : process.env.REACT_APP_PRODUCTION_CLIENT_ID
 
 root.render(
   <React.StrictMode>

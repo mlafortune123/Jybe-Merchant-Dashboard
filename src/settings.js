@@ -7,11 +7,10 @@ import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied
 import { Aside } from "./Aside.jsx"
 import { Header } from './Header.jsx';
 import ContinueButton from './ContinueButton.js';
-const API_URL = process.env.REACT_APP_API_URL
 
 const Settings = () => {
     const context = useContext(AccountContext);
-    const { admins, merchant } = context
+    const { admins, merchant, accessToken, refreshTheClock, API_URL } = context
     const [rowData, setRowData] = useState()
     const [colDefs, setColDefs] = useState();
     const [email, setEmail] = useState()
@@ -35,7 +34,7 @@ const Settings = () => {
 
     const ButtonRenderer = (props) => {
         return (
-            <ContinueButton active={true} text={'Remove'} onClick={() => removeAdmin(props.value)} />
+            <ContinueButton twoStep={true} active={true} text={'Remove'} onClick={() => removeAdmin(props.data.Email)} />
         );
     };
 
@@ -69,31 +68,64 @@ const Settings = () => {
     }, [])
 
     const addAdmin = () => {
-        fetch(`${API_URL}/addAdmin`, {
+        accessToken ? fetch(`${API_URL}/addAdmin`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
             },
             body: JSON.stringify({ email })
         })
             .then(res => res.json())
             .then(res => {
-                toast.success("Admin added successfully!")
+                if (res.error) toast.error(res.error)
+                    else {
+                        refreshTheClock()
+                        toast.success("Admin added successfully!")
+                    }
             })
+            :
+            toast.error("Wait for access token please")
     }
 
     const removeAdmin = (email) => {
-        fetch(`${API_URL}/removeAdmin`, {
+        accessToken ? fetch(`${API_URL}/removeAdmin`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
             },
             body: JSON.stringify({ email })
         })
             .then(res => res.json())
             .then(res => {
-                toast.success("Admin removed successfully!")
+                if (res.error) toast.error(res.error)
+                    else {
+                        refreshTheClock()
+                        toast.success("Admin added successfully!")
+                    }
             })
+            :
+            toast.error("Wait for access token please")
+    }
+
+    const resetKeys = () => {
+        accessToken ? fetch(`${API_URL}/removeAdmin`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.error) toast.error(res.error)
+                    else {
+                        refreshTheClock()
+                        toast.success("Keys Reset Successfully! You can now download the new ones")
+                    }
+            })
+            :
+            toast.error("Wait for access token please")
     }
 
     const gridOptions = {
@@ -110,8 +142,59 @@ const Settings = () => {
         }
     };
 
+    const downloadPublicKey = () => {
+        fetch(`${API_URL}/retrievePublicKey`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/x-pem-file',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        })
+            .then(response => response.blob())
+            .then(blob => {
+                // Create a temporary link element
+                const url = window.URL.createObjectURL(new Blob([blob]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'public_key'
+
+                // Append the link to the body and click it programmatically
+                document.body.appendChild(link);
+                link.click();
+
+                // Clean up: remove the link from the DOM
+                link.parentNode.removeChild(link);
+            })
+            .catch(error => console.error('Error downloading file:', error));
+    }
+
+    const downloadPrivateKey = () => {
+        fetch(`${API_URL}/retrievePrivateKey`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        })
+            .then(response => response.blob())
+            .then(blob => {
+                // Create a temporary link element
+                const url = window.URL.createObjectURL(new Blob([blob]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'private_key.pem'); // Set the default filename
+
+                // Append the link to the body and click it programmatically
+                document.body.appendChild(link);
+                link.click();
+
+                // Clean up: remove the link from the DOM
+                link.parentNode.removeChild(link);
+            })
+            .catch(error => console.error('Error downloading file:', error));
+    }
+
     return (
-        <div className='rainbow' >
+        <div className='flex-fullscreen rainbow' >
             <Toaster
                 toastOptions={{
                     className: '',
@@ -122,28 +205,51 @@ const Settings = () => {
                     },
                 }}
             />
-            <Aside/>
+            <Aside />
             {rowData && rowData.length > 1 &&
                 <div className='inside-wrapper'>
-                    <h2 style={{ fontSize: '36px', textDecoration: 'underline' }} >ADMINS</h2>
-                    <div
-                        className="ag-theme-quartz" // applying the grid theme
-                        style={{ height: `${48 + (rowData.length * 60)}px`, }} // the grid will fill the size of the parent container
-                    >
-                        <AgGridReact
-                            //gridOptions={gridOptions}
-                            rowHeight={60}
-                            rowData={[...rowData]}
-                            columnDefs={colDefs}
-                        />
-                        </div>
-                        <div style={{ background: 'white', padding: '16px' }} >Add a New Admin
-                            <div style={{ width: '100%', background: 'lightgrey', height: '1px', left: '-16px', position: 'relative', marginTop: '12px' }} />
-                            <div style={{ width: '100%', display: 'flex', justifyContent: 'space-evenly', margin: '8px 0px' }} >
-                                <input style={{ width: '40%' }} placeholder='email' className='input' value={email} onChange={e => setEmail(e.target.value)} />
-                                <ContinueButton active={true} text={'Add as Admin'} onClick={addAdmin} />
+                    <h2 className='page-title' >ADMINS</h2>
+                    <div style={{display:'flex', height:'88vh', justifyContent: 'space-between', flexDirection:'column' }} >
+                        <div className='grid-wrapper' >
+                            <div
+                                className="ag-theme-quartz" // applying the grid theme
+                                style={{ height: `${48 + (rowData.length * 60)}px`, }} // the grid will fill the size of the parent container
+                            >
+                                <AgGridReact
+                                    //gridOptions={gridOptions}
+                                    rowHeight={60}
+                                    rowData={[...rowData]}
+                                    columnDefs={colDefs}
+                                />
                             </div>
                         </div>
+                        <div className='space-between'>
+                        <div style={{ background: 'white', padding: '16px', borderRadius: '16px' }} >Add a New Admin
+                            <div style={{ width: '100%', background: 'lightgrey', height: '1px', position: 'relative', marginTop: '12px' }} />
+                            <div style={{ width: '100%', display: 'flex', justifyContent: 'space-evenly', margin: '8px 0px' }} >
+                                <input style={{ width: '40%' }} placeholder='email' className='input' value={email} onChange={e => setEmail(e.target.value)} />
+                                <ContinueButton twoStep={true} active={true} text={'Add as Admin'} onClick={addAdmin} />
+                            </div>
+                        </div>
+                        <div style={{ background: 'white', padding: '16px', borderRadius: '16px' }} >
+                            Download Keys
+                            <div style={{ width: '100%', background: 'lightgrey', height: '1px', position: 'relative', marginTop: '12px' }} />
+                            <div className='space-between' style={{ margin: '16px' }} >
+                                <ContinueButton twoStep={true} active={true} text={'Public'} onClick={downloadPublicKey} />
+                                <ContinueButton twoStep={true} active={true} text={'Private'} onClick={downloadPrivateKey} />
+                                {/* <a className='continue-button' onClick={downloadPublicKey}>Public</a>
+                                <a className='continue-button' onClick={downloadPrivateKey}>Private</a> */}
+                            </div>
+                        </div>
+                        <div style={{ background: 'white', padding: '16px', borderRadius: '16px' }} >
+                            INVALIDATE KEYS
+                            <div style={{ width: '100%', background: 'lightgrey', height: '1px', position: 'relative', marginTop: '12px' }} />
+                            <div className='space-between' style={{ margin: '16px' }} >
+                                <ContinueButton twoStep={true} active={true} text={'Reset Keys'} onClick={resetKeys} />
+                            </div>
+                        </div>
+                        </div>
+                    </div>
                 </div>
             }
         </div>

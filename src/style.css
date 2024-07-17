@@ -2,6 +2,10 @@
   background-color: #ffffff;
 }
 
+.title{
+  color: black;
+}
+
 .text-wrapper-3{
   font-size: 1.5vw;
 }
@@ -21,14 +25,14 @@
 }
 
 .grid-wrapper{
-  height: 80vh;
   width: 100%;
-  padding: 2vh;
+  padding: 16px;
   background: rgba(255, 255, 255, 0.75);
   display: flex;
   gap: 16px;
   flex-direction: column;
   border-radius: 16px;
+  margin-top: 3vh;
 }
 
 .root{
@@ -43,40 +47,112 @@
 .inside-wrapper{
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
-  padding: 16px;
   width: 100%;
+  padding: 16px;
+}
+
+.cards-wrapper{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+}
+
+.eighty{
+  height: 80%;
 }
 
 .dashboard-card{
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 15px;
   padding: 16px;
-  gap: 8px;
+  gap: 16px;
   display: flex;
   flex: 1 1 100px; /* All children will have the same flex-basis */
 
 }
 
 .rt-content{
-  gap: 8px;
+  width: 100%;
+  gap: 16px;
   display: flex;
   flex-direction: column;
+  justify-content: space-evenly;
 }
 
 .logo{
-  margin-right: 10px;
+  margin-left: 25px;
+  width: 150px;
+}
+
+.page-title{
+  height: 52.5px;
+  display: flex;
+  align-items: center;
+  font-size: 36px;
 }
 
 .pages-wrapper {
   width: 200px;
-  height: 100vh;
+  height: calc(98vh - 52.5px);
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.5);
+  /* background: rgba(255, 255, 255, 0.5); */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 5vh 0vh;
+  padding-top: 3vh;
+}
+
+.hamburger-please{
+  display: none;
+}
+
+.bm-menu {
+  background: linear-gradient(to bottom right, rgba(200, 200, 200, 0.5), rgba(200, 200, 200, 0.5)), linear-gradient(to bottom right, rgba(254, 219, 89) 0%, rgba(255, 146, 101) 25%,rgba(254, 64, 116) 50%, rgba(147, 52, 174) 75%, rgba(41, 40, 234) 100%);
+  width: 100vw;
+}
+
+.bm-burger-button {
+  position: fixed;
+  width: 36px;
+  height: 30px;
+  left: 36px;
+  top: 36px;
+  z-index: 1000; /* Ensure it is above other content */
+}
+
+.bm-burger-bars {
+  background: #373a47;
+}
+
+.bm-cross-button {
+  height: 24px;
+  width: 24px;
+}
+
+.bm-cross {
+  background: #bdc3c7;
+}
+
+.bm-menu-wrap {
+  position: fixed;
+  height: 100%;
+}
+
+.bm-item-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-top: 5vh;
+  height: 95vh!important;
+}
+
+.bm-item {
+  display: inline-block;
+}
+
+.bm-overlay {
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .pages-wrapper > div {
@@ -85,7 +161,14 @@
 }
 
 .ma-img{
-  width: 5vh;
+  width: 27.6px;
+  height: 27.6px;
+}
+
+.img-wrapper{
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .page-link {
@@ -95,8 +178,26 @@
   align-items: center;
 }
 
+.province{
+  font-family: Poppins, sans-serif;
+  border-radius: 6px;
+  border: 1px solid rgba(224, 224, 224, 1);
+  background-color: #f6f6f6;
+  margin-top: 4px;
+  color: #222;
+  font-weight: 400;
+  padding: 10px 12px;
+}
+
 a:hover{
   cursor: pointer;
+}
+
+select{
+  outline: none;
+  border: none;
+  background: transparent;
+  font-family: 'Poppins';
 }
 
 .page-link a img {
@@ -260,10 +361,12 @@ a:hover{
 }
 
 .continue-button{
+  background:rgb(36, 59, 108);
+  height:50px;
   color: #fff;
   font-weight: 500;
   border-radius: 12px;
-  padding: 12px 76px;
+  padding: 12px 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -271,7 +374,7 @@ a:hover{
   cursor: pointer;
   border: 0px;
   font-size: 16px;
-  margin: auto;
+  margin: auto 0px;
 }
 
 .settings-container{
@@ -282,29 +385,127 @@ a:hover{
 .userdata-pair{
   display: flex;
   padding: 8px 0px;
+  justify-content: space-between;
+}
+
+.userdata-key{
+  color: grey;
+  text-decoration: underline;
+  text-decoration-color: rgba(211, 211, 211, 0.5);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.userdata-value{
+  text-decoration: underline;
+  text-decoration-color: rgba(211, 211, 211, 0.5);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  text-align: end;
+}
+
+.userdata-divider {
+  flex-grow: 1;
+  height: 1px;
+  background-color: rgba(211, 211, 211, 0.5);
+  margin-top:16px
+}
+
+.flex-fullscreen{
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
 }
 
 .rainbow{
   background: linear-gradient(to bottom right, rgba(254, 219, 89, 0.2) 0%, rgba(255, 146, 101, 0.3) 25%,rgba(254, 64, 116, 0.4) 50%, rgba(147, 52, 174, 0.5) 75%, rgba(41, 40, 234, 0.6) 100%);
-  height: 100vh;
-  width: 100vw;
-  display: flex;
 }
 
-.ytop{
+.subs{
   background: linear-gradient(to bottom right, rgba(254, 219, 89, 0.2) 0%, rgba(255, 146, 101, 0.3) 50%,rgba(254, 64, 116, 0.4) 100%);
-  height: 100vh;
-  width: 100vw;
-  display: flex;
 }
 
-.ptob{
+.settlements{
   background: linear-gradient(to bottom right, rgba(254, 64, 116, 0.4) 0%, rgba(147, 52, 174, 0.5) 50%,rgba(41, 40, 234, 0.6) 100%);
-  height: 100vh;
-  width: 100vw;
-  display: flex;
 }
 
+.users{
+  background: linear-gradient(to bottom right, rgba(173, 255, 47, 0.6) 0%, rgba(0, 255, 127, 0.5) 100%);
+}
+
+.users2{
+  background: linear-gradient(to bottom right, rgba(0, 255, 127, 0.5) 0%, rgba(0, 206, 209, 0.8) 100%);
+}
+
+.billing{
+  background: linear-gradient(to bottom right, rgba(255, 0, 0, 0.7) 0%, rgba(178, 34, 34, 0.5) 50%, rgba(139, 0, 0, 0.7) 100%);
+
+}
+
+.see-through{
+  -webkit-background-clip: text;
+  color: transparent;
+  font-weight: bold;
+}
+
+.summary-wrapper{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.stretch-apart{
+  display: flex;
+  justify-content: space-between;
+}
+
+.order{
+  background: rgba(255, 255, 255, 0.5);
+  padding: 16px;
+  border: 1px solid lightgrey;
+  border-radius: 16px;
+  height: 100vh;
+  /* margin-top: auto; */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.heavy{
+  font-weight: 600;
+}
+
+.green-button{
+  width: 65px;
+  background: lightgreen;
+  border-radius: 8px;
+  padding: 2px;
+  text-align: center;
+  color: white;
+  font-size: 16px;
+  align-self: center;
+  margin-left: 6px;
+}
+
+.refund{
+  background: red;
+  padding: 16px;
+  border-radius: 16px;
+  font-size: 24px
+}
+
+.space-between{
+  display: flex;
+  justify-content: space-between;
+}
+
+.intermediate{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  height: 100vh;
+}
 
 p{
   font-size: 16px;
