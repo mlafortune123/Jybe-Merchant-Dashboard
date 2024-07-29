@@ -28,14 +28,14 @@ const Settlement = () => {
     useEffect(() => {
         if (orders && merchant && payments) {
             const payment = payments.filter(payment => payment.payment_id == payment_id)[0]
-            const settledOrders = orders.filter(order => order.created_at.substring(0,10) == payment.payment_date.substring(0,10) && order.order_status != 'inactive')
+            const settledOrders = orders.filter(order => order.order_created_at.substring(0,10) == payment.payment_date.substring(0,10) && order.order_status != 'inactive')
 
             setPayment(payment)
             setSettledOrders(settledOrders)
 
             const transformedOrders = settledOrders.map(order => {
                 const transformedOrder = {};
-                transformedOrder['Date'] = order.created_at.substring(0, 10)
+                transformedOrder['Date'] = order.order_created_at.substring(0, 10)
                 transformedOrder['Monthly Payment'] = `$${order.jybe_cost/100}`
                 transformedOrder['User Markup'] = `${order.order_user_markup}% / $${(order.order_user_markup/100) * order.amount}`
                 transformedOrder['Merchant Markup'] = `${order.order_merchant_markup}% / $${(order.order_merchant_markup/100) * order.amount}`

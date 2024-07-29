@@ -518,3 +518,18 @@ h2{
 u{
   font-size: 24px;
 }
+
+input::placeholder {
+  color: grey;
+  font-style: italic;
+}
+
+/* Styling for actual value */
+input:not(:placeholder-shown) {
+  color: black;
+  font-weight: bold;
+}
+
+a:focus {
+  outline: none;
+}

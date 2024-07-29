@@ -12,7 +12,7 @@ const Settlements = () => {
   const context = useContext(AccountContext);
   const { payments, merchant, orders } = context
   const [rowData, setRowData] = useState()
-  const [dateFilter, setDateFilter] = useState()
+  const [dateFilter, setDateFilter] = useState("All Time")
   const fieldMapping = {
     payment_id: 'Payment ID',
     payment_amount: 'Total Paid',
@@ -49,7 +49,7 @@ const Settlements = () => {
             break;
         case 'week':
             filteredOrders = orders.filter(order => {
-                const orderDate = new Date(order.created_at);
+                const orderDate = new Date(order.payment_date);
                 const diffTime = Math.abs(now - orderDate);
                 const diffDays = diffTime / (1000 * 60 * 60 * 24);
                 return diffDays <= 7;
@@ -57,7 +57,7 @@ const Settlements = () => {
             break;
         case '30 days':
             filteredOrders = orders.filter(order => {
-                const orderDate = new Date(order.created_at);
+                const orderDate = new Date(order.payment_date);
                 const diffTime = Math.abs(now - orderDate);
                 const diffDays = diffTime / (1000 * 60 * 60 * 24);
                 return diffDays <= 30;
@@ -65,7 +65,7 @@ const Settlements = () => {
             break;
         case '90 days':
             filteredOrders = orders.filter(order => {
-                const orderDate = new Date(order.created_at);
+                const orderDate = new Date(order.payment_date);
                 const diffTime = Math.abs(now - orderDate);
                 const diffDays = diffTime / (1000 * 60 * 60 * 24);
                 return diffDays <= 90;
@@ -73,7 +73,7 @@ const Settlements = () => {
             break;
         case 'year':
             filteredOrders = orders.filter(order => {
-                const orderDate = new Date(order.created_at);
+                const orderDate = new Date(order.payment_date);
                 const diffTime = Math.abs(now - orderDate);
                 const diffDays = diffTime / (1000 * 60 * 60 * 24);
                 return diffDays <= 365;
@@ -91,7 +91,7 @@ const Settlements = () => {
       const filteredPayments = filterPaymentsByDate(payments, dateFilter);
       const transformedOrders = filteredPayments.map(payment => {
         const transformedOrder = {};
-        const theOrders = orders.filter(order => order.created_at.substring(0, 10) == payment.payment_date.substring(0, 10) && order.order_status != 'inactive')
+        const theOrders = orders.filter(order => order.order_created_at.substring(0, 10) == payment.payment_date.substring(0, 10) && order.order_status != 'inactive')
         const totalFees = theOrders.reduce((a, b) => {
           return a + (((b.order_user_markup + b.order_merchant_markup)/100) * b.amount)
         }, 0)

@@ -24,7 +24,7 @@ const Subscriptions = () => {
             break;
           case 'week':
               filteredOrders = orders.filter(order => {
-                  const orderDate = new Date(order.created_at);
+                  const orderDate = new Date(order.order_created_at);
                   const diffTime = Math.abs(now - orderDate);
                   const diffDays = diffTime / (1000 * 60 * 60 * 24);
                   return diffDays <= 7;
@@ -32,7 +32,7 @@ const Subscriptions = () => {
               break;
           case '30 days':
               filteredOrders = orders.filter(order => {
-                  const orderDate = new Date(order.created_at);
+                  const orderDate = new Date(order.order_created_at);
                   const diffTime = Math.abs(now - orderDate);
                   const diffDays = diffTime / (1000 * 60 * 60 * 24);
                   return diffDays <= 30;
@@ -40,7 +40,7 @@ const Subscriptions = () => {
               break;
           case '90 days':
               filteredOrders = orders.filter(order => {
-                  const orderDate = new Date(order.created_at);
+                  const orderDate = new Date(order.order_created_at);
                   const diffTime = Math.abs(now - orderDate);
                   const diffDays = diffTime / (1000 * 60 * 60 * 24);
                   return diffDays <= 90;
@@ -48,7 +48,7 @@ const Subscriptions = () => {
               break;
           case 'year':
               filteredOrders = orders.filter(order => {
-                  const orderDate = new Date(order.created_at);
+                  const orderDate = new Date(order.order_created_at);
                   const diffTime = Math.abs(now - orderDate);
                   const diffDays = diffTime / (1000 * 60 * 60 * 24);
                   return diffDays <= 365;
@@ -77,9 +77,8 @@ const Subscriptions = () => {
         const filteredOrders = filterOrdersByDate(orders, dateFilter);
         const transformedOrders = filteredOrders.map(order => {
             const transformedOrder = {};
-            transformedOrder['Date'] = order.created_at.substring(0, 10);
-            const monthsPassed = (new Date().getFullYear() - new Date(order.created_at).getFullYear()) * 12 + new Date().getMonth() - new Date(order.created_at).getMonth();
-            console.log(monthsPassed)
+            transformedOrder['Date'] = order.order_created_at.substring(0, 10);
+            const monthsPassed = (new Date().getFullYear() - new Date(order.order_created_at).getFullYear()) * 12 + new Date().getMonth() - new Date(order.order_created_at).getMonth();
             transformedOrder['Progress'] = monthsPassed
             for (const [oldField, newField] of Object.entries(fieldMapping)) {
                 transformedOrder[newField] = order[oldField];

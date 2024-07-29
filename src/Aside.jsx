@@ -18,27 +18,26 @@ export const Aside = () => {
     <div style={{paddingTop:'2vh', background:'rgba(255, 255, 255, 0.5)', width:'200px' }} >
         <div className="logo" style={{height:'52.5px', alignContent:'center' }} >
           <img src={logo} alt="logo" />
-          {/* <p style={{textAlign:'center', marginTop: '10px' }} >Merchant Dashboard</p> */}
         </div>
         <div className="pages-wrapper">
         <div>
           <div className={`page-link ${window.location.pathname === '/' ? 'active' : ''}`}>
-            {window.location.pathname === '/' && <div class="border" />}
+            {window.location.pathname === '/' && <div className="border" />}
             <Link to="/">
               <img className="ma-img" src={home} alt="svg" /> Dashboard
             </Link>
           </div>
 
-          <div class={`page-link ${window.location.pathname === '/subscriptions' ? 'active' : ''}`}>
-            {window.location.pathname === '/subscriptions' && <div class="border" />}
+          <div className={`page-link ${window.location.pathname === '/subscriptions' ? 'active' : ''}`}>
+            {window.location.pathname === '/subscriptions' && <div className="border" />}
             <Link to="/subscriptions">
               <img className="ma-img" src={calender} alt="svg" />
               Subscriptions
             </Link>
           </div>
 
-          <div class={`page-link ${window.location.pathname === '/settlements' ? 'active' : ''}`}>
-            {window.location.pathname === '/settlements' && <div class="border" />}
+          <div className={`page-link ${window.location.pathname === '/settlements' ? 'active' : ''}`}>
+            {window.location.pathname === '/settlements' && <div className="border" />}
             <Link to="/settlements">
               <img className="ma-img" src={settlement} alt="svg" />
               Settlements
@@ -47,14 +46,14 @@ export const Aside = () => {
 
         </div>
         <div >
-          <div class="page-link">
+          <div className="page-link">
             <a onClick={() => window.open("mailto:michaeltiller@jybe.ca")}>
               <img className="ma-img" src={chat} alt="svg" />
               Email Support
             </a>
           </div>
-          <div class={`page-link ${window.location.pathname === '/settings' ? 'active' : ''}`}>
-            {window.location.pathname === '/settings' && <div class="border" />}
+          <div className={`page-link ${window.location.pathname === '/settings' ? 'active' : ''}`}>
+            {window.location.pathname === '/settings' && <div className="border" />}
             <Link to="/settings">
               <img className="ma-img" src={settings} alt="svg" />
               Settings
@@ -88,22 +87,22 @@ export const Aside = () => {
         </div>
         <div style={{ marginTop: '-5vh' }} >
           <div className={`page-link ${window.location.pathname === '/' ? 'active' : ''}`}>
-            {window.location.pathname === '/' && <div class="border" />}
+            {window.location.pathname === '/' && <div className="border" />}
             <Link to="/">
               <img className="ma-img" src={home} alt="svg" /> Dashboard
             </Link>
           </div>
 
-          <div class={`page-link ${window.location.pathname === '/subscriptions' ? 'active' : ''}`}>
-            {window.location.pathname === '/subscriptions' && <div class="border" />}
+          <div className={`page-link ${window.location.pathname === '/subscriptions' ? 'active' : ''}`}>
+            {window.location.pathname === '/subscriptions' && <div className="border" />}
             <Link to="/subscriptions">
               <img className="ma-img" src={calender} alt="svg" />
               Subscriptions
             </Link>
           </div>
 
-          <div class={`page-link ${window.location.pathname === '/settlements' ? 'active' : ''}`}>
-            {window.location.pathname === '/settlements' && <div class="border" />}
+          <div className={`page-link ${window.location.pathname === '/settlements' ? 'active' : ''}`}>
+            {window.location.pathname === '/settlements' && <div className="border" />}
             <Link to="/settlements">
               <img className="ma-img" src={settlement} alt="svg" />
               Settlements
@@ -112,14 +111,14 @@ export const Aside = () => {
 
         </div>
         <div >
-          <div class="page-link">
+          <div className="page-link">
             <a onClick={() => window.open("mailto:michaeltiller@jybe.ca")}>
               <img className="ma-img" src={chat} alt="svg" />
               Email Support
             </a>
           </div>
-          <div class={`page-link ${window.location.pathname === '/settings' ? 'active' : ''}`}>
-            {window.location.pathname === '/settings' && <div class="border" />}
+          <div className={`page-link ${window.location.pathname === '/settings' ? 'active' : ''}`}>
+            {window.location.pathname === '/settings' && <div className="border" />}
             <Link to="/settings">
               <img className="ma-img" src={settings} alt="svg" />
               Settings

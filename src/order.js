@@ -2,13 +2,12 @@ import React, { useState, useContext, useEffect } from 'react';
 import { AccountContext } from './ProtectedRoute';
 import { Link } from "react-router-dom";
 import { Aside } from "./Aside.jsx"
-import { Header } from './Header.jsx';
 import orderimg from './images/order.svg'
 
 const Order = () => {
     const order_id = window.location.pathname.substring(7, 43)
     const context = useContext(AccountContext);
-    const { orders, merchant, payments, accessToken, API_URL } = context
+    const { orders, payments, accessToken, API_URL } = context
     const [order, setOrder] = useState()
     const [paymentId, setPaymentId] = useState()
 
@@ -16,13 +15,9 @@ const Order = () => {
         if (orders) {
             const order = orders.filter(order => order.order_id == order_id)[0]
             const settlements = payments.filter(payment => {
-                console.log(payment.payment_date, order.created_at)
-                return payment.payment_date.substring(0, 10) == order.created_at.substring(0, 10)
+                return payment.payment_date.substring(0, 10) == order.order_created_at.substring(0, 10)
             })
-            console.log(settlements)
-            console.log(order)
             settlements.length > 0 && setPaymentId(settlements[0].payment_id)
-            console.log(settlements)
             setOrder(order)
         }
     }, [orders, payments])
@@ -53,7 +48,7 @@ const Order = () => {
                                 Settled
                             </Link>}</div>
                             </div>
-                            {order.order_status == 'active' && <a onClick={refund} style={{background: 'red', padding: '8px 16px', borderRadius: '16px'}} >
+                            {order.order_status == 'active' && <a onClick={refund} style={{background: '#B0194A', padding: '8px 16px', borderRadius: '16px'}} >
                                 Refund
                             </a>}
                             </div>
@@ -67,7 +62,7 @@ const Order = () => {
                                         Status:&nbsp;
                                     </p>
                                     <span className='userdata-divider'></span>
-                                    <p className='userdata-value' style={{ color: order.order_status == 'active' ? 'green' : 'red' }} >
+                                    <p className='userdata-value' style={{ color: order.order_status == 'active' ? 'green' : '#B0194A' }} >
                                         {order.order_status}
                                     </p>
                                 </div>
@@ -85,7 +80,7 @@ const Order = () => {
                                 <div className='userdata-pair'>
                                     <p className='userdata-key'>Date:</p>
                                     <span className='userdata-divider'></span>
-                                    <p className='userdata-value'>{order.created_at.substring(0, 10)}</p>
+                                    <p className='userdata-value'>{order.order_created_at.substring(0, 10)}</p>
                                 </div>
                                 <div className='userdata-pair'>
                                     <p className='userdata-key'>Order ID:</p>
@@ -316,7 +311,7 @@ const Order = () => {
                                         Status:&nbsp;
                                     </p>
                                     <span className='userdata-divider'></span>
-                                    <p className='userdata-value' style={{ color: order.order_status == 'active' ? 'green' : 'red' }} >
+                                    <p className='userdata-value' style={{ color: order.order_status == 'active' ? 'green' : '#B0194A' }} >
                                         {order.order_status}
                                     </p>
                                 </div>

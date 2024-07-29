@@ -7,15 +7,15 @@ export const Header = ({merchant_name}) => {
   const { logout, user } = useAuth0();
   return (
     <header className="header" >
-      {/* <div class="header-leftside">
-        <div class="logo"> */}
+      {/* <div className="header-leftside">
+        <div className="logo"> */}
           <img src={logo} alt="logo" />
         {/* </div>
       </div> */}
-      <div class="header-right-side">
+      <div className="header-right-side">
         {/* <a href="/userinfo">Apply For More</a> */}
         <div style={{width:'100%'}} >
-          {/* <div class="bell-img">
+          {/* <div className="bell-img">
             <svg
               width="31"
               height="32"
@@ -55,7 +55,7 @@ export const Header = ({merchant_name}) => {
           onClick={(e) => {
             document.querySelector(".pages-wrapper").classList.toggle("active");
           }}
-          class="bars"
+          className="bars"
           alt=""
           style={{height:'3vh'}}
         /> */}

@@ -5,12 +5,12 @@ import toast, { Toaster } from 'react-hot-toast';
 import wallet from "./images/Wallet.svg";
 import { Aside } from "./Aside.jsx"
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import calender from "./images/Calendar.svg";
 import payments from "./images/payments.svg"
 import piggy from "./images/piggy.svg"
 import traffic from "./images/traffic.svg"
 import markups from "./images/markups.svg"
 import approval from "./images/approval.svg"
+import calender from "./images/Calendar.svg";
 import settlement from "./images/settlement.svg"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { add, format, differenceInCalendarDays, isFuture } from "date-fns";
@@ -25,7 +25,8 @@ const Dashboard = () => {
     const [totalTabBalance, setTotalTabBalance] = useState()
     const [approvalRate, setApprovalRate] = useState()
     const [chartData, setChartData] = useState()
-    const [filledData, setFilledData] = useState()
+    const [subscriptionsFilledData, setSubscriptionsFilledData] = useState()
+    const [settlementsFilledData, setSettlementsFilledData] = useState()
     const [domain, setDomain] = useState()
     const [ticks, setTicks] = useState()
     const [dateFilter, setDateFilter] = useState('All Time');
@@ -54,7 +55,7 @@ const Dashboard = () => {
                 break;
             case 'week':
                 filteredOrders = orders.filter(order => {
-                    const orderDate = new Date(order.created_at);
+                    const orderDate = new Date(order.order_created_at);
                     const diffTime = Math.abs(now - orderDate);
                     const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
@@ -63,7 +64,7 @@ const Dashboard = () => {
                 break;
             case '30 days':
                 filteredOrders = orders.filter(order => {
-                    const orderDate = new Date(order.created_at);
+                    const orderDate = new Date(order.order_created_at);
                     const diffTime = Math.abs(now - orderDate);
                     const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
@@ -72,7 +73,7 @@ const Dashboard = () => {
                 break;
             case '90 days':
                 filteredOrders = orders.filter(order => {
-                    const orderDate = new Date(order.created_at);
+                    const orderDate = new Date(order.order_created_at);
                     const diffTime = Math.abs(now - orderDate);
                     const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
@@ -81,7 +82,7 @@ const Dashboard = () => {
                 break;
             case 'year':
                 filteredOrders = orders.filter(order => {
-                    const orderDate = new Date(order.created_at);
+                    const orderDate = new Date(order.order_created_at);
                     const diffTime = Math.abs(now - orderDate);
                     const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
@@ -129,54 +130,84 @@ const Dashboard = () => {
         return ticks;
     };
 
-    const fillTicksData = (_ticks, data, endDate) => {
+    const fillSubscriptionsTicksData = (_ticks, data, endDate) => {
         const ticks = [..._ticks];
         const filled = [];
         let activeSubscriptions = 0;
         let subsTotal = 0
         let lastTimestamp = 0;
         for (const item of data) {
-            if (item.created_at < lastTimestamp) {
+            if (item.order_created_at < lastTimestamp) {
                 continue;
             }
-            else lastTimestamp = item.created_at;
+            else lastTimestamp = item.order_created_at;
             if (item.order_status == 'active') {
                 activeSubscriptions++
                 subsTotal += item.amount
-                filled.push({ created_at: item.created_at, active_subscriptions: activeSubscriptions, subsTotal, subAmount: item.amount });
+                filled.push({ order_created_at: item.order_created_at, active_subscriptions: activeSubscriptions, subsTotal, subAmount: item.amount });
             }
-            else filled.push({ created_at: item.created_at, active_subscriptions: activeSubscriptions, subsTotal });
+            else filled.push({ order_created_at: item.order_created_at, active_subscriptions: activeSubscriptions, subsTotal });
         }
         if (ticks.length) {
-            filled.push({ created_at: endDate, active_subscriptions: activeSubscriptions, subsTotal });
+            filled.push({ order_created_at: endDate, active_subscriptions: activeSubscriptions, subsTotal });
+        }
+        return filled;
+    };
+
+    const fillSettlementsTicksData = (_ticks, data, endDate) => {
+        const ticks = [..._ticks];
+        const filled = [];
+        let activeSubscriptions = 0;
+        let subsTotal = 0
+        let lastTimestamp = 0;
+        for (const item of data) {
+            const paymentAmount = item.amount * (1-(item.order_merchant_markup/100))
+            if (item.order_created_at < lastTimestamp) {
+                continue;
+            }
+            else lastTimestamp = item.order_created_at;
+            if (item.order_status == 'active') {
+                activeSubscriptions++
+                subsTotal += paymentAmount
+                filled.push({ order_created_at: item.order_created_at, active_subscriptions: activeSubscriptions, subsTotal, subAmount: paymentAmount });
+            }
+            else filled.push({ order_created_at: item.order_created_at, active_subscriptions: activeSubscriptions, subsTotal });
+        }
+        if (ticks.length) {
+            filled.push({ order_created_at: endDate, active_subscriptions: activeSubscriptions, subsTotal });
         }
         return filled;
     };
 
     useEffect(() => {
         if (chartData != undefined && chartData.length > 0) {
-            const sortedOrders = chartData.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-            const startDate = new Date(sortedOrders[0].created_at)
+            const sortedOrders = chartData.sort((a, b) => new Date(a.order_created_at) - new Date(b.order_created_at));
+            const startDate = new Date(sortedOrders[0].order_created_at)
             const endDate = new Date();
             const domain = [startDate, endDate];
             const ticks = getTicks(startDate, endDate, sortedOrders.length);
-            const filledData = fillTicksData(ticks, sortedOrders, endDate);
-            filledData.forEach(d => {
-                d.created_at = moment(d.created_at).valueOf(); // date -> epoch
+            const subscriptionsFilledData = fillSubscriptionsTicksData(ticks, sortedOrders, endDate);
+            subscriptionsFilledData.forEach(d => {
+                d.order_created_at = moment(d.order_created_at).valueOf(); // date -> epoch
             })
+            setSubscriptionsFilledData(subscriptionsFilledData)
+            const settlementsfilledData = fillSettlementsTicksData(ticks, sortedOrders, endDate);
+            settlementsfilledData.forEach(d => {
+                d.order_created_at = moment(d.order_created_at).valueOf(); // date -> epoch
+            })
+            setSettlementsFilledData(settlementsfilledData)
             setTicks(ticks)
             setDomain(domain)
-            setFilledData(filledData)
         }
         else {
             setTicks()
             setDomain()
-            setFilledData() 
+            setSubscriptionsFilledData() 
+            setSettlementsFilledData()
         }
-        console.log(filledData)
     }, [chartData])
 
-    const CustomTooltip = ({ active, payload, label }) => {
+    const SubscriptionCustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload[0]) {
             console.log(payload)
             if (payload[0].payload.subAmount) {
@@ -193,6 +224,22 @@ const Dashboard = () => {
         return null;
     };
 
+    const SettlementCustomTooltip = ({ active, payload, label }) => {
+        if (active && payload && payload[0]) {
+            console.log(payload)
+            if (payload[0].payload.subAmount) {
+                return (
+                    <div style={{ background: 'white', color: 'black', padding: '10px', borderRadius: '10px' }} className="custom-tooltip">
+                        <p className="label">{`${moment(label).format("MM-DD")}`}</p>
+                        <p>This subscription added ${payload[0].payload.subAmount} to your payments!</p>
+                        {/* <p className="intro">{`${payload[0].payload.active_subscriptions} subscriptions added`}</p> */}
+                        {/* <p className="desc">Revenue: ${payload[1].value}</p> */}
+                    </div>
+                );
+            }
+        }
+        return null;
+    };
     return (
         <div className='flex-fullscreen rainbow' >
             <Aside />
@@ -213,16 +260,16 @@ const Dashboard = () => {
                         <div className='cards-wrapper'>
                             <div className='space-between' style={{ gap: '16px', marginTop: '6px' }}>
                                 <Link to="/subscriptions" className='dashboard-card'>
-                                    <div class="rt-content">
-                                        <div class="img-wrapper">
+                                    <div className="rt-content">
+                                        <div className="img-wrapper">
                                             <img className="ma-img" src={calender} alt="" />
                                             <h2 className='title'>Subscriptions</h2>
                                         </div>
-                                        {(filledData && domain && ticks) ?
+                                        {(subscriptionsFilledData && domain && ticks) ?
                                             <ResponsiveContainer height={window.screen.height * 0.35}>
-                                                <LineChart style={{ marginLeft: '-20px' }} data={filledData}>
+                                                <LineChart style={{ marginLeft: '-20px' }} data={subscriptionsFilledData}>
                                                     <XAxis
-                                                        dataKey={"created_at"}
+                                                        dataKey={"order_created_at"}
                                                         hasTick
                                                         scale="time"
                                                         tickFormatter={date => format(new Date(date), "dd/MMM")}
@@ -231,7 +278,7 @@ const Dashboard = () => {
                                                         ticks={ticks}
                                                         stroke='grey' />
                                                     <YAxis />
-                                                    <Tooltip content={<CustomTooltip />} />
+                                                    <Tooltip content={<SubscriptionCustomTooltip />} />
                                                     <Line
                                                         type="monotone"
                                                         dataKey="active_subscriptions"
@@ -246,23 +293,19 @@ const Dashboard = () => {
                                     </div>
                                 </Link>
                                 <Link to="/settlements" className='dashboard-card'>
-                                    <div class="rt-content">
-                                        <div class="img-wrapper">
+                                    <div className="rt-content">
+                                        <div className="img-wrapper">
                                             <img className="ma-img" src={settlement} alt="" />
                                             <h2 className='title'>Total Settlements</h2>
                                         </div>
-                                        {(filledData && domain && ticks) ?
+                                        {(settlementsFilledData && domain && ticks) ?
                                             <ResponsiveContainer height={window.screen.height * 0.35}>
                                                 <LineChart
-                                                    data={filledData}
-                                                    margin={{
-                                                        top: 5,
-                                                        left: -10,
-                                                        bottom: 5,
-                                                    }}
+                                                    data={settlementsFilledData}
+                                                    style={{marginLeft:'-20px'}}
                                                 >
                                                     <XAxis
-                                                        dataKey={"created_at"}
+                                                        dataKey={"order_created_at"}
                                                         hasTick
                                                         scale="time"
                                                         tickFormatter={date => format(new Date(date), "dd/MMM")}
@@ -271,7 +314,7 @@ const Dashboard = () => {
                                                         ticks={ticks}
                                                         stroke='grey' />
                                                     <YAxis tickFormatter={(value) => `$${value}`} />
-                                                    <Tooltip content={<CustomTooltip />} />
+                                                    <Tooltip content={<SettlementCustomTooltip />} />
                                                     <Line
                                                         type="monotone"
                                                         dataKey="subsTotal"
@@ -288,39 +331,39 @@ const Dashboard = () => {
                             </div>
                             <div className='space-between' style={{ gap: '16px' }}>
                                 <div className='dashboard-card'>
-                                    <div class="img-wrapper">
+                                    <div className="img-wrapper">
                                         <img className="ma-img eighty" src={approval} alt="" />
                                     </div>
-                                    <div class="rt-content">
+                                    <div className="rt-content">
                                         <p className='title'>Approval Rate</p>
                                         <p className='big-value' id='approval'>{approvalRate}%</p>
                                     </div>
                                 </div>
                                 <div className='dashboard-card'>
-                                    <div class="img-wrapper">
+                                    <div className="img-wrapper">
                                         <img className="ma-img eighty" src={traffic} alt="" />
                                     </div>
-                                    <div class="rt-content">
+                                    <div className="rt-content">
                                         <p className='title'>Your Status / Jybe's Status</p>
                                         <div style={{ display: 'flex', fontSize: '24px' }}>
-                                            <p className='big-value' style={{ color: merchant.merchant_status == 'Active' ? 'green' : 'red' }}>{merchant.merchant_status}</p>&nbsp;/&nbsp;{frozen != undefined && <p className='big-value' style={{ color: !frozen ? 'green' : 'red' }}>{frozen ? "Down" : "Active"}</p>}
+                                            <p className='big-value' style={{ color: merchant.merchant_status == 'active' ? 'green' : 'red' }}>{merchant.merchant_status}</p>&nbsp;/&nbsp;{frozen != undefined && <p className='big-value' style={{ color: !frozen ? 'green' : 'red' }}>{frozen ? "Down" : "active"}</p>}
                                         </div>
                                     </div>
                                 </div>
                                 <div className='dashboard-card'>
-                                    <div class="img-wrapper">
+                                    <div className="img-wrapper">
                                         <img className="ma-img eighty" src={payments} alt="" />
                                     </div>
-                                    <div class="rt-content">
+                                    <div className="rt-content">
                                         <p className='title'>Your next payment will be</p>
                                         <p className='big-value'>${parseFloat(merchant.pending_tab).toFixed(2)}</p>
                                     </div>
                                 </div>
                                 <div className='dashboard-card'>
-                                    <div class="img-wrapper">
+                                    <div className="img-wrapper">
                                         <img className="ma-img eighty" src={markups} alt="" />
                                     </div>
-                                    <div data-tooltip-id="my-tooltip" class="rt-content">
+                                    <div data-tooltip-id="my-tooltip" className="rt-content">
                                         <p className='title'>Markups</p>
                                         <p className='big-value' style={{ fontSize: '16px' }}>User: {merchant.user_markup}% <br /> Merchant: {merchant.merchant_markup}%</p>
                                         <ReactTooltip id="my-tooltip" style={{ width: '50vh' }}>
@@ -331,28 +374,28 @@ const Dashboard = () => {
                             </div>
                             <div className='space-between' style={{ gap: '16px' }}>
                                 <div className='dashboard-card'>
-                                    <div class="img-wrapper">
+                                    <div className="img-wrapper">
                                         <img className="ma-img eighty" src={calender} alt="" />
                                     </div>
-                                    <div class="rt-content">
+                                    <div className="rt-content">
                                         <p className='title'>Total # of Subscriptions</p>
                                         <p className='big-value'>{orders.length}</p>
                                     </div>
                                 </div>
                                 <div className='dashboard-card'>
-                                    <div class="img-wrapper">
+                                    <div className="img-wrapper">
                                         <img className="ma-img eighty" src={calender} alt="" />
                                     </div>
-                                    <div class="rt-content">
+                                    <div className="rt-content">
                                         <p className='title'> Active Subscriptions </p>
                                         <p className='big-value'>{chartData && chartData.length}</p>
                                     </div>
                                 </div>
                                 <div className='dashboard-card'>
-                                    <div class="img-wrapper">
+                                    <div className="img-wrapper">
                                         <img className="ma-img eighty" src={calender} alt="" />
                                     </div>
-                                    <div class="rt-content">
+                                    <div className="rt-content">
                                         <p className='title'>Total Value of Subscriptions</p>
                                         <p className='big-value'>${orders.reduce((a, b) => {
                                             return a + parseFloat(b.amount)
@@ -360,10 +403,10 @@ const Dashboard = () => {
                                     </div>
                                 </div>
                                 <div className='dashboard-card'>
-                                    <div class="img-wrapper">
+                                    <div className="img-wrapper">
                                         <img className="ma-img eighty" src={calender} alt="" />
                                     </div>
-                                    <div class="rt-content">
+                                    <div className="rt-content">
                                         <p className='title'>Value of Active Subscriptions </p>
                                         <p className='big-value'>${chartData && chartData.reduce((a, b) => {
                                             return a + parseFloat(b.amount)

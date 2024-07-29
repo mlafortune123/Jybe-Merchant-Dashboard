@@ -206,7 +206,7 @@ const Settings = () => {
                 }}
             />
             <Aside />
-            {rowData && rowData.length > 1 &&
+            {rowData && rowData.length >= 1 &&
                 <div className='inside-wrapper'>
                     <h2 className='page-title' >ADMINS</h2>
                     <div style={{display:'flex', height:'88vh', justifyContent: 'space-between', flexDirection:'column' }} >

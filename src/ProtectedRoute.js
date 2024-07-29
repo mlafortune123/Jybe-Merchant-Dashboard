@@ -16,7 +16,7 @@ export const ProtectedRoute = ({ component: Component }) => {
     const [frozen, setFrozen] = useState()
     // const [activeOrders, setActiveOrders] = useState()
     // const [inactiveOrders, setInactiveOrders] = useState()
-    const { isAuthenticated, isLoading, loginWithRedirect, getAccessTokenSilently, getIdTokenClaims, user } = useAuth0();
+    const { isAuthenticated, isLoading, loginWithRedirect, getAccessTokenSilently, getIdTokenClaims, user, logout } = useAuth0();
     const [accessToken, setAccessToken] = useState()
     const [refreshToken, setRefreshToken] = useState()
     const [isDone, setIsDone] = useState(false)
@@ -41,8 +41,16 @@ export const ProtectedRoute = ({ component: Component }) => {
                 }
             })
                 .then(response => {
-                    //if (response.status == 401) window.location.reload()
-                    if (response.status == 403) navigate("/")
+                    if (response.status == 401) logout({
+                        logoutParams: {
+                            returnTo: window.location.origin
+                        }
+                    })
+                    if (response.status == 403) logout({
+                        logoutParams: {
+                            returnTo: window.location.origin
+                        }
+                    })
                     if (response.status === 500 || response.status === 502) window.alert("The requested service is currently unavailable at the moment.")
                     return response.json()
                 })
@@ -60,7 +68,7 @@ export const ProtectedRoute = ({ component: Component }) => {
                     }
                 })
 
-                accessToken && fetch(`${API_URL}/checkReserves`, {
+            accessToken && fetch(`${API_URL}/checkReserves`, {
                 method: "GET",
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
@@ -86,15 +94,15 @@ export const ProtectedRoute = ({ component: Component }) => {
     }, [accessToken, refreshToken])
 
     const calculateMonthsDifference = async (item) => {
-        const itemDate = new Date(item.created_at);
+        const itemDate = new Date(item.order_created_at);
         const oneYearLater = new Date(itemDate);
         oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
         const currentDate = new Date();
         const monthsDifference = (oneYearLater.getFullYear() - currentDate.getFullYear()) * 12 + (oneYearLater.getMonth() - currentDate.getMonth());
         itemDate.setMonth(currentDate.getMonth());
         itemDate.setFullYear(currentDate.getFullYear());
-        return { ...item, monthsDifference, itemDate: itemDate.toISOString().slice(0, 10)};
-      };
+        return { ...item, monthsDifference, itemDate: itemDate.toISOString().slice(0, 10) };
+    };
 
     const refreshTheClock = () => {
         setRefreshToken(token => !token)
@@ -103,11 +111,11 @@ export const ProtectedRoute = ({ component: Component }) => {
     if (window.location.search.includes('?error=access_denied&error_description=Please%20verify%20your%20email%20before%20continuing.')) {
         navigate("/IntermediateScreen?noerror")
     }
-    else if (isLoading || !isDone) {
-        return <Loading />; // Render a loading indicator while authentication state is being determined
-    }
     else if (isAuthenticated) {
-        return (
+        if (isLoading || !isDone) {
+            return <Loading />; // Render a loading indicator while authentication state is being determined
+        }
+        else return (
             <AccountContext.Provider value={{ orders, merchant, user, accessToken, navigate, payments, admins, frozen, refreshTheClock, API_URL }}>
                 <Component />
             </AccountContext.Provider>

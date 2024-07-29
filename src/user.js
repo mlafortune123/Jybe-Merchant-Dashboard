@@ -35,7 +35,7 @@ const User = () => {
 
                 // Combine first_name and last_name into Name
                 //transformedOrder['Name'] = `${order.first_name} ${order.last_name}`;
-                transformedOrder['Date'] = order.created_at.substring(0, 10)
+                transformedOrder['Date'] = order.order_created_at.substring(0, 10)
                 // Map the other fields
                 for (const [oldField, newField] of Object.entries(fieldMapping)) {
                     transformedOrder[newField] = order[oldField];
